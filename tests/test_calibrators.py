@@ -1,5 +1,6 @@
 from typing import Tuple, Optional
 
+# Without this XGBoost gets a segmentation fault
 import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
