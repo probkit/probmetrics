@@ -338,6 +338,7 @@ based on $f(X)$ instead of $g(f(X))$ so the loss difference uses the same choice
   - Re-structured the base `Calibrator` class to differentiate
   `_predict_proba_torch_impl` from `_predict_proba_impl`.
   - Added Kuiper and Kolmogorov-Smirnov binary calibration metrics.
+  - Deprecated python 3.9, added python 3.13 and 3.14 support.
 - v1.2.0 by [@elsacho](https://github.com/elsacho): Added new proper loss functions:
   - ProperLpLoss(p=p): Metrics to evaluate $E[ \Vert f(X) - E[Y|f(X)] \Vert_p ]$ where
     $f(X)$ are the predictions of the classifier, $p >= 1$, including `p=float("inf")`
