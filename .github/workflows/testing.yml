@@ -25,6 +25,9 @@ jobs:
       PIP_RETRIES: "5"
     steps:
       - uses: actions/checkout@v4
+      - name: Install OpenMP
+        if: runner.os == 'macOS'
+        run: brew install libomp
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
