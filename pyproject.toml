@@ -5,21 +5,24 @@ build-backend = "hatchling.build"
 [project]
 name = "probmetrics"
 dynamic = ["version"]
-description = 'Probabilistic metrics and calibration methods'
+description = "Probabilistic metrics and calibration methods"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "Apache-2.0"
-keywords = ['Metrics', 'Classification', 'Calibration', 'Refinement']
+keywords = ["Metrics", "Classification", "Calibration", "Refinement"]
 authors = [
-    { name = "David Holzmüller" }, #, email = "a@b.org" },
+    {name = "David Holzmüller", email = "a@b.org"},
+    {name = "Eugène Berta", email = "eugene.berta@gmail.com"},
+    {name = "Sacha Braun"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "License :: OSI Approved :: Apache Software License",
@@ -28,25 +31,28 @@ dependencies = [
     "torch>=2.0",
     "numpy>=1.25",
     "scikit-learn>=1.3",
-    # older versions of torchmetrics (<1.2.1) have a bug that makes certain metrics slow:
-    # https://github.com/Lightning-AI/torchmetrics/pull/2184
-    "torchmetrics>=1.2.1",
-    # added constraint due to some pytabkit failure case with github actions, needed for python >= 3.10 anyway
-    "numba>=0.59.0",
+    "torchmetrics>=1.2.1", # older versions of torchmetrics (<1.2.1) have a bug that
+    # makes certain metrics slow: https://github.com/Lightning-AI/torchmetrics/pull/2184
+    "pytorch-minimize",
 ]
 
 [project.optional-dependencies]
 extra = [
+    "numba>=0.59.0", # For SAGA based versions of logistic calibrators. Added constraint
+    # due to some pytabkit failure case with github actions, needed for python >= 3.10
+    # anyway
+    "netcal", # For BBQ, ENIR, Netcal TS
+    "uncertainty-calibration", # For BinaryPlattBinnerCalibrator
+    "betacal", # For BetacalCalibrator
+    "splinecalib", # For MLISplineCalibrator
     "venn-abers", # Venn-Abers calibration
     "cir-model", # centered isotonic regression
-    "netcal", # for temperature scaling comparison
-    "relplot", # for smooth ECE
-    "pytorch-minimize", # for torchcal TS implementation
-    # relplot fails for sklearn 1.7: ModuleNotFoundError: No module named 'sklearn.utils._estimator_html_repr'
-    "scikit-learn>=1.3",
-    "catboost", # For the WS_CatboostClassifier
-    "lightgbm", # For the WS_LGBMClassifier
-    "scipy",    # For the WS_LGBMClassifier to handle softmax 
+    "scipy",    # For WS_LGBMClassifier and ETSCalibrator
+    "relplot", # for smooth ECE. relplot fails for sklearn 1.7: ModuleNotFoundError: No
+    # module named 'sklearn.utils._estimator_html_repr'
+    "catboost", # For WS_CatboostClassifier and CatBoostCalibrator
+    "lightgbm", # For WS_LGBMClassifier and LightGBMCalibrator
+    "xgboost", # For XGBoostCalibrator
 ]
 dev = [
     "matplotlib>=3.0", # plotting
@@ -76,7 +82,7 @@ installer = "uv"
 features = ["extra", "dev"]
 
 [[tool.hatch.envs.test.matrix]]
-python = ["3.9", "3.10", "3.11", "3.12"]
+python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
 [tool.hatch.envs.test.scripts]
 run-tests = "pytest {args}"
