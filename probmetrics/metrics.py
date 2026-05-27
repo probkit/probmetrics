@@ -113,7 +113,7 @@ class Metrics:
                      TopClassLoss(ProperLpLoss(p=2)),
                      TopClassLoss(ProperLpLoss(p=float('inf'))),
                      BrierLoss(binary_as_multiclass=False),
-                     SmoothCalibrationError(),
+                     SmoothCalibrationError(), KuiperCalibrationMetric(),
                      MSE(), RMSE(), NRMSE(), MAE(), NMAE()]
         cand_list.extend([MeanProbNormalizedMetric(metric) for metric in
                           [ClippedLogLoss(), LogLoss(), BrierLoss(), ClassError(), Accuracy()]])
@@ -898,6 +898,59 @@ class SmoothCalibrationError(ClassificationMetric):
             conf = y_pred.get_probs().detach().cpu().numpy()[:, 1]
             acc = labels
         return torch.as_tensor(rp.smECE(f=conf, y=acc), device=labels_torch.device, dtype=torch.float32)
+
+
+class KuiperCalibrationMetric(ClassificationMetric):
+    def __init__(self):
+        super().__init__(name='kuiper', is_lower_better=True)
+
+    def _compute_mean(self, y_true: CategoricalDistribution, y_pred: CategoricalDistribution, **kwargs) -> Optional[torch.Tensor]:
+        labels = y_true.get_modes().flatten().float()
+        probs = y_pred.get_probs()[..., 1].flatten().float()
+
+        N = labels.numel()
+        if N == 0:
+            return torch.tensor(0.0, device=labels.device)
+
+        probs_sorted, sort_idx = torch.sort(probs)
+        labels_sorted = labels[sort_idx]
+
+        cum_probs = torch.cumsum(probs_sorted, dim=0) / N
+        cum_labels = torch.cumsum(labels_sorted, dim=0) / N
+
+        diffs = cum_labels - cum_probs
+
+        max_dev = torch.max(diffs.max(), torch.tensor(0.0, device=diffs.device))
+        min_dev = torch.min(diffs.min(), torch.tensor(0.0, device=diffs.device))
+
+        kuiper_score = max_dev - min_dev
+
+        return kuiper_score
+    
+
+class KolmogorovSmirnovCalibrationMetric(ClassificationMetric):
+    def __init__(self):
+        super().__init__(name='kolmogorov-smirnov', is_lower_better=True)
+
+    def _compute_mean(self, y_true: CategoricalDistribution, y_pred: CategoricalDistribution, **kwargs) -> Optional[torch.Tensor]:
+        labels = y_true.get_modes().flatten().float()
+        probs = y_pred.get_probs()[..., 1].flatten().float()
+
+        N = labels.numel()
+        if N == 0:
+            return torch.tensor(0.0, device=labels.device)
+
+        probs_sorted, sort_idx = torch.sort(probs)
+        labels_sorted = labels[sort_idx]
+
+        cum_probs = torch.cumsum(probs_sorted, dim=0) / N
+        cum_labels = torch.cumsum(labels_sorted, dim=0) / N
+
+        diffs = cum_labels - cum_probs
+        abs_diffs = torch.abs(diffs)
+        kolmogorovsmirnov = abs_diffs.max()
+
+        return kolmogorovsmirnov
 
 
 class MetricsWithCalibration(Metrics):
