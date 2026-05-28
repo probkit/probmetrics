@@ -32,7 +32,7 @@ Probmetrics is available via
 ```bash
 pip install probmetrics
 ```
-To obtain all functionality, install `probmetrics[extra,dev,dirichletcal]`.
+To obtain all functionality, run `pip install 'probmetrics[extra,dev,dirichletcal]'`.
 - extra installs:
   - numba for SAGA based optimizers in logistic calibrators SVS, SMS and others.
   - relplot for smooth ECE (only works with scikit-learn versions <= 1.6).
