@@ -20,7 +20,7 @@ It accompanies our papers
 (see also: [experiments](https://github.com/eugeneberta/LogisticCalibrationBenchmark))  
 [3] [A Variational Estimator for Lp Calibration Errors](https://arxiv.org/abs/2602.24230)
 (see also [all experiments](https://github.com/ElSacho/Evaluating_Lp_Calibration_Errors))  
-[4] [CalArena: A Large-Scale Post-Hoc Calibration Benchmark](link_to_come)
+[4] [CalArena: A Large-Scale Post-Hoc Calibration Benchmark](https://arxiv.org/abs/2605.30188)
 (see also [leaderboards and experiments](https://github.com/probkit/CalArena))  
 
 Please cite us if you use this repository for research purposes.
